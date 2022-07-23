@@ -27,7 +27,7 @@ export default class AuthController {
         return response.redirect('/user')
     }
 
-    public async social_signup({ auth, ally }) {
+    /* public async social_signup({ auth, ally }) {
         const github = ally.use('github')
 
         const githubUser = await github.user()
@@ -40,7 +40,7 @@ export default class AuthController {
         })
 
         await auth.use('web').login(user)
-    }
+    } */
 
     public async login({ request, auth, response }: HttpContextContract) {
         const req = await request.validate({

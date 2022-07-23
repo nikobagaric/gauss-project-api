@@ -21,13 +21,10 @@
 import Route from '@ioc:Adonis/Core/Route'
 import User from 'App/Models/User'
 
-// Default auth
 Route.post('/signup', 'AuthController.signup')
 Route.post('/login', 'AuthController.login')
 Route.post('/logout', 'AuthController.logout')
-Route.get('/github/callback', 'AuthController.social_signup')
 
-Route.resource('/user', 'UsersController')
 
-// Social auth
+//Route.resource('/user', 'UsersController')
 
