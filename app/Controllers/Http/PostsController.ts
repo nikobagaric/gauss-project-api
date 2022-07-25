@@ -15,6 +15,10 @@ export default class PostsController {
 
     public async store({ request, auth, response }: HttpContextContract) {
         // POST new Post object
+        if(!auth.isLoggedIn) {
+            return response.status(401)
+        }
+
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),
@@ -47,8 +51,14 @@ export default class PostsController {
         return Post.findOrFail(params.id)
     }
 
-    public async update({ request, response, params }: HttpContextContract) {
+    public async update({ request, response, auth, params }: HttpContextContract) {
         // PUT/PATCH Post by id
+        const post = await Post.findOrFail(params.id)
+
+        if(!auth.isLoggedIn || post.userId != auth.user!.id) {
+            return response.status(401)
+        }
+
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),
@@ -63,8 +73,6 @@ export default class PostsController {
         await req.image?.move(Application.publicPath('images'), {
             name: imageName
         })
-
-        const post = await Post.findOrFail(params.id)
 
         post.title = req.title
         post.description = req.description
