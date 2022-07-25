@@ -3,16 +3,18 @@ import { schema } from '@ioc:Adonis/Core/Validator'
 import Application from '@ioc:Adonis/Core/Application'
 import Post from 'App/Models/Post'
 
+/*
+Controller for operations with Posts
+*/
+
 export default class PostsController {
-    public async index({}: HttpContextContract){
+    public async index({ }: HttpContextContract) {
+        // GET all Posts
         return Post.all()
     }
 
-    public async create({ view }: HttpContextContract) {
-        return view.render('posts/create')
-    }
-
-    public async store({ request, auth, response}: HttpContextContract) {
+    public async store({ request, auth, response }: HttpContextContract) {
+        // POST new Post object
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),
@@ -41,10 +43,12 @@ export default class PostsController {
     }
 
     public async show({ params }: HttpContextContract) {
+        // GET Post by id
         return Post.findOrFail(params.id)
     }
 
     public async update({ request, response, params }: HttpContextContract) {
+        // PUT/PATCH Post by id
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),
@@ -71,8 +75,12 @@ export default class PostsController {
     }
 
     public async destroy({ params }: HttpContextContract) {
+        // DELETE Post by id
         const post = await Post.findOrFail(params.id)
         return post.delete()
     }
 
+    /* public async create({ view }: HttpContextContract) {
+        return view.render('posts/create')
+    } */
 }
