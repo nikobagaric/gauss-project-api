@@ -19,11 +19,12 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
-import User from 'App/Models/User'
 
 Route.post('/signup', 'AuthController.signup')
 Route.post('/login', 'AuthController.login')
 Route.post('/logout', 'AuthController.logout')
+
+Route.resource('/post', 'PostsController')
 
 
 //Route.resource('/user', 'UsersController')

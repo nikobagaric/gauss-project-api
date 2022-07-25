@@ -36,16 +36,43 @@ export default class PostsController {
         post.image = `images/${imageName}`
         post.title = req.title
         post.userId = auth.user!.id
-        post.save()
-        return response.redirect(`/${auth.user!.username}`)
+        await post.save()
+        return response.status(200)
     }
 
     public async show({ params }: HttpContextContract) {
         return Post.findOrFail(params.id)
     }
 
-    public async update({ }: HttpContextContract) {
+    public async update({ request, response, params }: HttpContextContract) {
+        const req = await request.validate({
+            schema: schema.create({
+                title: schema.string({}),
+                description: schema.string({}),
+                image: schema.file.nullableAndOptional({
+                    size: '8mb',
+                    extnames: ['jpg', 'png', 'jpeg', 'svg'],
+                })
+            })
+        })
+        const imageName = new Date().getTime().toString() + `.${req.image?.extname}`
+        await req.image?.move(Application.publicPath('images'), {
+            name: imageName
+        })
 
+        const post = await Post.findOrFail(params.id)
+
+        post.title = req.title
+        post.description = req.description
+        post.image = `images/${imageName}`
+
+        await post.save()
+        return response.status(200)
+    }
+
+    public async destroy({ params }: HttpContextContract) {
+        const post = await Post.findOrFail(params.id)
+        return post.delete()
     }
 
 }

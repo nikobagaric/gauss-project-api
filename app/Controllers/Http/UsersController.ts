@@ -3,7 +3,7 @@ import User from 'App/Models/User'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 
 export default class UsersController {
-    public async index(ctx: HttpContextContract) {
+    public async index() {
         return User.all()
     }
 

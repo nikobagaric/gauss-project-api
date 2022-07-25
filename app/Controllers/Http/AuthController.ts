@@ -1,3 +1,4 @@
+import Hash from '@ioc:Adonis/Core/Hash'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User'
@@ -22,25 +23,10 @@ export default class AuthController {
         user.email = req.email
         user.username = req.username
         user.password = req.password
+
         await user.save()
-
-        return response.redirect('/user')
+        return response.status(201)
     }
-
-    /* public async social_signup({ auth, ally }) {
-        const github = ally.use('github')
-
-        const githubUser = await github.user()
-
-        const user = await User.firstOrCreate({
-          email: githubUser.email,
-        }, {
-          username: githubUser.name,
-          isVerified: githubUser.emailVerificationState === 'verified'
-        })
-
-        await auth.use('web').login(user)
-    } */
 
     public async login({ request, auth, response }: HttpContextContract) {
         const req = await request.validate({
@@ -56,15 +42,21 @@ export default class AuthController {
 
         const email = req.email
         const password = req.password
-        const user = await auth.attempt(email, password)
 
+        const user = await User
+            .query()
+            .where('email', email)
+            .firstOrFail()
+
+        if(!(await Hash.verify(user.password, password))) {
+            return response.unauthorized('Invalid credentials')
+        }
         const token = await auth.use('api').generate(user)
-
-        return response.redirect(`/${user.username}`)
+        return token
     }
 
     public async logout({ auth, response }: HttpContextContract) {
         await auth.logout()
-        return response.redirect('/')
+        return response.status(200)
     }
 }
