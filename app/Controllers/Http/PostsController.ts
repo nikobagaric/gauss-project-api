@@ -15,10 +15,7 @@ export default class PostsController {
 
     public async store({ request, auth, response }: HttpContextContract) {
         // POST new Post object
-        if(!auth.isLoggedIn) {
-            return response.status(401)
-        }
-
+        auth.use('api').authenticate
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),
@@ -54,11 +51,7 @@ export default class PostsController {
     public async update({ request, response, auth, params }: HttpContextContract) {
         // PUT/PATCH Post by id
         const post = await Post.findOrFail(params.id)
-
-        if(!auth.isLoggedIn || post.userId != auth.user!.id) {
-            return response.status(401)
-        }
-
+        auth.use('api').authenticate
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),

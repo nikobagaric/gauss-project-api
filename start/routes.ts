@@ -26,7 +26,5 @@ Route.post('/logout', 'AuthController.logout')
 
 Route.resource('/post', 'PostsController')
 Route.resource('/friend', 'FriendsController')
-
-
-//Route.resource('/user', 'UsersController')
+Route.resource('/user', 'UsersController')
 

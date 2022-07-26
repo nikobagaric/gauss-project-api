@@ -6,8 +6,20 @@ Controller for Friends feature
 */
 
 export default class FriendsController {
+    public async index({ auth, response }) {
+        if(!auth.use('api').isLoggedIn) {
+            return response.status(401)
+        }
+
+        const friends = Friend
+            .query()
+            .where('user_id', auth.user!.id)
+
+        return friends
+    }
+
     public async store({ params, response, auth }: HttpContextContract) {
-        if(!auth.isLoggedIn) {
+        if(!auth.use('api').isLoggedIn) {
             return response.status(401)
         }
 
@@ -20,7 +32,7 @@ export default class FriendsController {
     }
 
     public async destroy({ params, response, auth }) {
-        if(!auth.isLoggedIn) {
+        if(!auth.use('api').isLoggedIn) {
             return response.status(401)
         }
 

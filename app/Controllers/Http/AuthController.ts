@@ -1,4 +1,3 @@
-import Hash from '@ioc:Adonis/Core/Hash'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User'
@@ -8,12 +7,12 @@ Controller for user authentication
 */
 
 export default class AuthController {
-    public async signup({ request, response }: HttpContextContract) {
+    public async signup({ request, auth }: HttpContextContract) {
         // Create new User
         const req = await request.validate({
             schema: schema.create({
-                email: schema.string({}, [rules.email()]),
-                username: schema.string({}),
+                email: schema.string({}, [rules.email(), rules.unique({ table: 'users', column: 'email', caseInsensitive: true })]),
+                username: schema.string({}, [rules.unique({ table: 'users', column: 'username' })]),
                 password: schema.string({}, [rules.minLength(8)]),
             }),
             messages: {
@@ -30,7 +29,11 @@ export default class AuthController {
         user.password = req.password
 
         await user.save()
-        return response.status(201)
+        const token = await auth.use('api').login(user, {
+            expiresIn: '10 days',
+        })
+
+        return token.toJSON()
     }
 
     public async login({ request, auth, response }: HttpContextContract) {
@@ -49,21 +52,24 @@ export default class AuthController {
         const email = req.email
         const password = req.password
 
-        const user = await User
-            .query()
-            .where('email', email)
-            .firstOrFail()
-
-        if(!(await Hash.verify(user.password, password))) {
+        try {
+            const token = await auth.use('api').attempt(email, password, {
+                expiresIn: '10 days',
+            })
+            return token.toJSON
+        } catch {
             return response.unauthorized('Invalid credentials')
         }
-        const token = await auth.use('api').generate(user)
-        return token
     }
 
     public async logout({ auth, response }: HttpContextContract) {
         // Log out user
-        await auth.use('api').logout()
-        return response.status(200)
+        if(!auth.use('api').isLoggedIn)  {
+            return response.unauthorized('Already logged out')
+        }
+        await auth.use('api').revoke()
+        return {
+            revoked: true
+        }
     }
 }
