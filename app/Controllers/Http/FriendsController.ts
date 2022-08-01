@@ -6,7 +6,7 @@ Controller for Friends feature
 */
 
 export default class FriendsController {
-    public async index({ auth }) {
+    public async index({ auth }: HttpContextContract) {
         const friends = Friend
             .query()
             .where('user_id', auth.user!.id)
@@ -23,7 +23,7 @@ export default class FriendsController {
         return response.status(200)
     }
 
-    public async destroy({ params, response, auth }) {
+    public async destroy({ params, response, auth }: HttpContextContract) {
         const friend = Friend
             .query()
             .where('user_id', auth.user!.id)
