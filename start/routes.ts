@@ -20,13 +20,27 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
+Route.post('/signup', 'AuthController.signup')
+Route.post('/login', 'AuthController.login')
+Route.post('/logout', 'AuthController.logout').middleware('auth')
+Route.get('/verify-email/:email', 'VerificationsController.confirm').as('verifyEmail')
 
-Route.post('signup', 'AuthController.signup')
-Route.post('login', 'AuthController.login')
-Route.post('logout', 'AuthController.logout')
+Route.get('/github/callback', 'OAuthController.githubLogin')
+Route.get('/google/callback', 'OAuthController.googleLogin')
+Route.get('/twitter/callback', 'OAuthController.twitterLogin')
+Route.get('/facebook/callback', 'OAuthController.facebookLogin')
 
-Route.resource('post', 'PostsController').apiOnly()
-Route.resource('friend', 'FriendsController').apiOnly()
-Route.resource('user', 'UsersController').apiOnly()
+Route.get('/users', 'UsersController.index')
+Route.get('/users/id', 'UserController.show')
+Route.put('/users/id', 'UsersController.update').middleware('auth')
 
+Route.get('/posts', 'PostsController.index').middleware('auth')
+Route.get('/posts/id', 'PostsController.show').middleware('auth')
+Route.post('/posts', 'PostsController.store').middleware('auth')
+Route.put('/posts/id', 'PostsController.update').middleware('auth')
+Route.delete('/posts/id', 'PostsController.destroy').middleware('auth')
+Route.patch('/posts/like', 'PostsController.like').middleware('auth')
+Route.patch('/posts/unlike', 'PostsController.unlike').middleware('auth')
 
+Route.post('/friend/:userid', 'FriendsController.store').middleware('auth')
+Route.delete('/friend/:userid', 'FriendsController.destroy').middleware('auth')

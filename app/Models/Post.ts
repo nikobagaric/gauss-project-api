@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, BelongsTo, column, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 
 export default class Post extends BaseModel {
@@ -16,7 +16,7 @@ export default class Post extends BaseModel {
   public image: string
 
   @column()
-  public likeAmount: number
+  public likeAmount: number = 0
 
   @column()
   public userId: number

@@ -75,6 +75,18 @@ export default class PostsController {
         return
     }
 
+    public async like({ params }: HttpContextContract) {
+        const post = await Post.findOrFail(params.id)
+        post.likeAmount += 1
+        return post.likeAmount
+    }
+
+    public async unlike({ params }: HttpContextContract) {
+        const post = await Post.findOrFail(params.id)
+        post.likeAmount -= 1
+        return post.likeAmount
+    }
+
     /* public async create({ view }: HttpContextContract) {
         return view.render('posts/create')
     } */

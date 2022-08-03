@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('title')
       table.string('description')
-      table.integer('like_amount')
+      table.integer('like_amount').defaultTo(0)
       table.integer('user_id')
 
       /**

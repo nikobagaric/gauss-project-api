@@ -17,17 +17,20 @@ export default class User extends BaseModel {
   @column()
   public email: string
 
-  @column({serializeAs: null})
+  @column({ serializeAs: null })
   public password: string
 
   @column()
   public rememberMeToken: string
 
   @column()
+  public accesToken: string
+
+  @column()
   public description: string
 
   @column()
-  public isVerified: boolean
+  public isVerified: boolean = false
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -49,7 +52,9 @@ export default class User extends BaseModel {
   }
 
   public async sendVerificationEmail() {
-    const url = Env.get('APP_URL') + Route.makeSignedUrl('verifyEmail', { params: { email: this.email }, expiresIn: '30m', })
+    const url =
+      Env.get('APP_URL') +
+      Route.makeSignedUrl('verifyEmail', { params: { email: this.email }, expiresIn: '30m' })
     Mail.send((message) => {
       message
         .from('niko@nulldesign.org')
