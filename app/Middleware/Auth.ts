@@ -24,6 +24,7 @@ export default class AuthMiddleware {
    * during the current request.
    */
   protected async authenticate(auth: HttpContextContract['auth'], guards: (keyof GuardsList)[]) {
+    await auth.use('api').authenticate()
     /**
      * Hold reference to the guard last attempted within the for loop. We pass
      * the reference of the guard to the "AuthenticationException", so that

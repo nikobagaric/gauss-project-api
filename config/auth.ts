@@ -104,6 +104,8 @@ const authConfig: AuthConfig = {
         |
         */
         model: () => import('App/Models/User'),
+        connection: 'pg',
+        hashDriver: 'argon',
       },
     },
   },

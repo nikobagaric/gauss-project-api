@@ -8,9 +8,11 @@ export default class UsersSchema extends BaseSchema {
       table.increments('id').primary()
       table.string('username', 255).notNullable()
       table.string('email', 255).notNullable()
-      table.string('password', 180).notNullable()
+      table.string('password', 180).nullable()
+      table.string('provider').nullable()
+      table.string('provider_id').nullable()
       table.string('remember_me_token').nullable()
-      table.boolean('is_verified')
+      table.boolean('is_verified').defaultTo(false)
 
       /**
        * Uses timestampz for PostgreSQL and DATETIME2 for MSSQL

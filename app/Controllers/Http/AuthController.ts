@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import Hash from '@ioc:Adonis/Core/Hash'
 import User from 'App/Models/User'
 
 /*
@@ -39,34 +40,25 @@ export default class AuthController {
     const token = await auth.use('api').login(user, {
       expiresIn: '10 days',
     })
-
     return token.toJSON()
   }
 
   public async login({ request, auth, response }: HttpContextContract) {
     // Authenticate User by email and password, token auth
-    const req = await request.validate({
-      schema: schema.create({
-        email: schema.string({}, [rules.email()]),
-        password: schema.string({}, [rules.minLength(8)]),
-      }),
-      messages: {
-        'email.required': 'Email is required to log in',
-        'password.required': 'Password is required to log in',
-      },
-    })
+    const email = request.input('email')
+    const password = request.input('password')
 
-    const email = req.email
-    const password = req.password
+    // Lookup user manually
+    const user = await User.query().where('email', email).firstOrFail()
 
-    try {
-      const token = await auth.use('api').attempt(email, password, {
-        expiresIn: '10 days',
-      })
-      return token.toJSON()
-    } catch {
+    // Verify password
+    if (!(await Hash.verify(user.password!, password))) {
       return response.unauthorized('Invalid credentials')
     }
+
+    // Generate token
+    const token = await auth.use('api').generate(user)
+    return await auth.use('api').authenticate()
   }
 
   public async logout({ auth, response }: HttpContextContract) {
