@@ -20,40 +20,48 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', () => {
+
+Route.get('/', async () => {
   return 'Hello world'
 })
 
-Route.get('/test', async ({auth}) => {
-  return await auth.use('api').authenticate()
-})
-
 Route.group(() => {
+  // Auth routes, available to non-authenticated users
   Route.post('/signup', 'AuthController.signup')
   Route.post('/login', 'AuthController.login')
 
   Route.get('/login/github', 'OAuthController.gitRedirect')
   Route.get('/login/github/callback', 'OAuthController.gitCallback')
 
-  Route.get('/users', 'UsersController.index')
-  Route.get('/users/:id', 'UserController.show')
-
-  Route.get('/verify-email/:email', 'VerificationsController.confirm').as('verifyEmail')
 }).middleware('guest')
 
+
 Route.group(() => {
+  Route.get('/users', 'UsersController.index')
+  Route.get('/users/:id', 'UserController.show')
+  Route.get('/users/:id/friend_list', 'FriendsController.index')
+
+  Route.get('/posts', 'PostsController.index')
+  Route.get('/posts/:id', 'PostsController.show')
+  Route.get('/posts/:id/likes', 'LikesController.index')
+
+  Route.get('/verify-email/:email', 'VerificationsController.confirm').as('verifyEmail')
+})
+
+Route.group(() => {
+  // Auth only routes
   Route.post('/logout', 'AuthController.logout')
 
   Route.put('/users/:id', 'UsersController.update')
 
-  Route.get('/posts', 'PostsController.index')
-  Route.get('/posts/:id', 'PostsController.show')
   Route.post('/posts', 'PostsController.store')
   Route.put('/posts/:id', 'PostsController.update')
   Route.delete('/posts/:id', 'PostsController.destroy')
-  Route.patch('/posts/:id/like', 'PostsController.like')
-  Route.patch('/posts/:id/unlike', 'PostsController.unlike')
+  Route.post('/posts/:id/like', 'LikesController.store')
+  Route.delete('/posts/:id/unlike', 'LikesController.destroy')
 
   Route.post('/users/:id/add', 'FriendsController.store')
   Route.delete('/users/:id/remove', 'FriendsController.destroy')
-}).middleware('auth:api')
+
+  Route.post('/verify-email', 'EmailVerifiesController.index')
+}).middleware('auth')

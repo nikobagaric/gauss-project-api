@@ -18,7 +18,7 @@ export default class User extends BaseModel {
   public email: string
 
   @column({ serializeAs: null })
-  public password: string | null
+  public password: string
 
   @column()
   public provider: string
@@ -27,7 +27,10 @@ export default class User extends BaseModel {
   public providerId: string
 
   @column()
-  public rememberMeToken: string
+  public accessToken: string
+
+  @column()
+  public rememberMeToken?: string
 
   @column()
   public description: string
@@ -46,6 +49,9 @@ export default class User extends BaseModel {
 
   @hasMany(() => Friend)
   public friends: HasMany<typeof Friend>
+
+  @hasMany(() => Post)
+  public likedPosts: HasMany<typeof Post>
 
   @beforeSave()
   public static async hashPassword(user: User) {

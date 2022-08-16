@@ -15,7 +15,6 @@ export default class PostsController {
 
     public async store({ request, auth }: HttpContextContract) {
         // POST new Post object
-        auth.use('api').authenticate
         const req = await request.validate({
             schema: schema.create({
                 title: schema.string({}),
@@ -35,10 +34,12 @@ export default class PostsController {
         await req.image?.move(Application.publicPath('images'), {
             name: imageName
         })
+
         const post = new Post()
         post.image = `images/${imageName}`
         post.title = req.title
         post.userId = auth.user!.id
+
         await post.save()
         return post
     }
@@ -68,23 +69,11 @@ export default class PostsController {
 
     public async destroy({ params, auth }: HttpContextContract) {
         const user = await auth.authenticate()
-        const post = await Post.query()
+        await Post.query()
             .where('user_id', user.id)
             .where('id', params.id)
             .delete()
         return
-    }
-
-    public async like({ params }: HttpContextContract) {
-        const post = await Post.findOrFail(params.id)
-        post.likeAmount += 1
-        return post.likeAmount
-    }
-
-    public async unlike({ params }: HttpContextContract) {
-        const post = await Post.findOrFail(params.id)
-        post.likeAmount -= 1
-        return post.likeAmount
     }
 
     /* public async create({ view }: HttpContextContract) {

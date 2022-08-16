@@ -35,6 +35,7 @@ export default redisConfig({
     | redis driver.
     |
     */
+    session: Env.get('SESSION_DRIVER'),
     local: {
       host: Env.get('REDIS_HOST'),
       port: Env.get('REDIS_PORT'),

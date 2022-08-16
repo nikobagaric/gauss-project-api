@@ -1,6 +1,8 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 
+import Env from '@ioc:Adonis/Core/Env'
+
 export default class OAuthController {
   public gitRedirect({ ally }: HttpContextContract) {
     return ally.use('github').redirect()
@@ -59,9 +61,15 @@ export default class OAuthController {
       }
     )
 
-    await auth.use('api').login(user)
+    const oat = await auth.use('api').login(user)
 
-    return response.ok
+    response.cookie(
+      String(Env.get('API_TOKEN_COOKIE_NAME')),
+      oat.token,
+      { maxAge: 2147483647, sameSite: 'none', secure: true, httpOnly: true }
+    )
+
+    return response.ok(oat)
   }
 
 }
