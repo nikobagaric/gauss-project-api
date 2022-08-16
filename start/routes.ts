@@ -38,7 +38,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.get('/users', 'UsersController.index')
-  Route.get('/users/:id', 'UserController.show')
+  Route.get('/users/:id', 'UsersController.show')
   Route.get('/users/:id/friend_list', 'FriendsController.index')
 
   Route.get('/posts', 'PostsController.index')
@@ -63,5 +63,5 @@ Route.group(() => {
   Route.post('/users/:id/add', 'FriendsController.store')
   Route.delete('/users/:id/remove', 'FriendsController.destroy')
 
-  Route.post('/verify-email', 'EmailVerifiesController.index')
+  Route.post('/verify-email', 'VerificationsController.index')
 }).middleware('auth')

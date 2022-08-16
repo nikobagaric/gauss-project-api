@@ -7,9 +7,9 @@ Controller for operations with Users
 */
 
 export default class UsersController {
-    public async index() {
+    public async index({ response }: HttpContextContract) {
         // GET all User objects
-        return User.all()
+        return response.ok(await User.all())
     }
 
     public async store({ request, response }: HttpContextContract) {
@@ -23,13 +23,12 @@ export default class UsersController {
 
         const user = await User.create(payload)
 
-        response.status(201)
-        return user
+        return response.created(user)
     }
 
-    public async show({ params }: HttpContextContract) {
+    public async show({ params, response }: HttpContextContract) {
         // GET User object by ID
-        return User.findOrFail(params.id)
+        return response.ok(await User.findOrFail(params.id))
     }
 
     public async update({ params, request, response }: HttpContextContract) {
@@ -44,14 +43,15 @@ export default class UsersController {
         const user = await User.findOrFail(params.id)
 
         user.merge(payload)
+        user.save()
 
-        response.status(200)
-        return user.save()
+        return response.ok(user)
     }
 
-    public async destroy({ params }: HttpContextContract) {
+    public async destroy({ params, response }: HttpContextContract) {
         // DELETE User object by ID
         const user = await User.findOrFail(params.id)
-        return user.delete()
+        await user.delete()
+        return response.ok(user)
     }
 }

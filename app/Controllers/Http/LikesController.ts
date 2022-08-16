@@ -2,9 +2,9 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Like from 'App/Models/Like'
 
 export default class LikesController {
-  public async index({ params }: HttpContextContract) {
+  public async index({ params, response }: HttpContextContract) {
     const likes = await Like.query().where('post_id', params.id)
-    return likes
+    return response.ok(likes)
   }
 
   public async store({ params, auth, response }: HttpContextContract) {

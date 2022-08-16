@@ -7,17 +7,17 @@ Controller for Friends feature
 */
 
 export default class FriendsController {
-  public async index({ auth }: HttpContextContract) {
+  public async index({ auth, response }: HttpContextContract) {
     const friends = await Friend.query().where('user_id', auth.user!.id)
-    return friends
+    return response.ok(friends)
   }
 
-  public async show({ params, auth }: HttpContextContract) {
+  public async show({ params, auth, response }: HttpContextContract) {
     const friend = await Friend.query()
       .where('user_id', auth.user!.id)
       .where('friend_id', params.id)
       .firstOrFail()
-    return friend
+    return response.ok(friend)
   }
 
   public async store({ params, response, auth }: HttpContextContract) {
@@ -29,7 +29,7 @@ export default class FriendsController {
     friend.friendId = user.id
 
     await friend.save()
-    return response.status(200)
+    return response.created(friend)
   }
 
   public async destroy({ params, response, auth }: HttpContextContract) {
@@ -39,6 +39,6 @@ export default class FriendsController {
       .firstOrFail()
 
     await friend!.delete()
-    return response.status(200)
+    return response.ok('Friend removed')
   }
 }
